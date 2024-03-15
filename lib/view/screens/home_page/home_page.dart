@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../../../utills/globals/routes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +15,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double progress = 0;
+  double containerSize = 400;
+  int index = 0;
+  double angle = 0;
 
   Future<void> progressBar() async {
     await Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -32,9 +38,26 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Timer.periodic(const Duration(seconds: 0), (timer) {
+      angle = index * (pi * 2) / 60;
+      if (index < 60) {
+        index++;
+      } else {
+        index = 0;
+      }
+      setState(() {});
+    });
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home Page"),
+        title: const Text("Home Page"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.clockPage);
+            },
+            icon: const Icon(Icons.watch_later),
+          )
+        ],
       ),
       body: Container(
         alignment: Alignment.center,
@@ -70,6 +93,41 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.blue,
                 strokeWidth: 4,
                 value: progress,
+              ),
+            ),
+
+            GestureDetector(
+              onTap: () {
+                containerSize += 50;
+                index++;
+                setState(() {});
+              },
+              onDoubleTap: () {
+                containerSize -= 50;
+                index--;
+                setState(() {});
+              },
+              child: Transform.rotate(
+                angle: angle,
+                child: AnimatedContainer(
+                  height: containerSize,
+                  width: containerSize,
+                  duration: const Duration(seconds: 1),
+                  decoration: const BoxDecoration(
+                    // color: Colors.primaries[index % 18],
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(
+                          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Earth_Western_Hemisphere_transparent_background.png/1200px-Earth_Western_Hemisphere_transparent_background.png"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    "Container",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ),
             ),
           ],
