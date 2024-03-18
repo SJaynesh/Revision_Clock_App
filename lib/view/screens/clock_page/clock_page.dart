@@ -19,16 +19,55 @@ class _ClockPageState extends State<ClockPage> {
   bool isTimer = false;
   bool isReverse = false;
 
+  bool isTimerClock = false;
+
   int hour = 0;
   int minute = 0;
   int second = 0;
+
+  List<Map<String, dynamic>> timerHistory = [];
+
+  int h = 00;
+  int m = 00;
+  int s = 00;
+
+  void timerClock() {
+    isTimerClock = true;
+    Future.delayed(
+      const Duration(microseconds: 1),
+      () {
+        setState(() {
+          if (isTimerClock) {
+            s++;
+          }
+          if (s > 59) //  60 > 59
+          {
+            m++;
+            s = 0;
+          }
+          if (m > 59) {
+            h++;
+            m = 0;
+          }
+
+          if (h > 12) {
+            h = 0;
+          }
+        });
+        if (isTimerClock) {
+          timerClock();
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     TextScaler textScaler = MediaQuery.textScalerOf(context);
     Size size = MediaQuery.of(context).size;
 
-    double h = size.height;
-    double w = size.width;
+    double height = size.height;
+    double width = size.width;
 
     Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
@@ -124,9 +163,10 @@ class _ClockPageState extends State<ClockPage> {
         ),
       ),
       appBar: AppBar(
-          // automaticallyImplyLeading: false,
-          title: const Text("Clock App"),
-          backgroundColor: Colors.primaries[second % 18].shade300),
+        // automaticallyImplyLeading: false,
+        title: const Text("Clock App"),
+        // backgroundColor: Colors.primaries[second % 18].shade300,
+      ),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(h * 0.02),
@@ -154,51 +194,61 @@ class _ClockPageState extends State<ClockPage> {
               Visibility(
                 visible: isAnalog,
                 child: CircleAvatar(
-                  radius: w * 0.015,
+                  radius: width * 0.015,
                   backgroundColor: Colors.black26,
                 ),
               ),
 
               // Second
 
-              Transform.rotate(
-                angle: second * (pi * 2) / 60 + pi / 2,
-                child: Divider(
-                  color: Colors.redAccent,
-                  thickness: 2,
-                  indent: w * 0.09,
-                  endIndent: w * 0.4,
+              Visibility(
+                visible: isAnalog,
+                child: Transform.rotate(
+                  angle: second * (pi * 2) / 60 + pi / 2,
+                  child: Divider(
+                    color: Colors.redAccent,
+                    thickness: 2,
+                    indent: width * 0.09,
+                    endIndent: width * 0.4,
+                  ),
                 ),
               ),
 
               // Minute
-              Transform.rotate(
-                // Rotate for 90°
-                angle: pi / 2,
+              Visibility(
+                visible: isAnalog,
                 child: Transform.rotate(
-                  angle: minute * (pi * 2) / 60,
-                  child: Divider(
-                    color: Colors.blue,
-                    thickness: 3,
-                    indent: w * 0.15,
-                    endIndent: w * 0.45,
+                  // Rotate for 90°
+                  angle: pi / 2,
+                  child: Transform.rotate(
+                    angle: minute * (pi * 2) / 60,
+                    child: Divider(
+                      color: Colors.blue,
+                      thickness: 3,
+                      indent: width * 0.15,
+                      endIndent: width * 0.45,
+                    ),
                   ),
                 ),
               ),
 
               // hour
-              Transform.rotate(
-                angle: pi / 2,
+              Visibility(
+                visible: isAnalog,
                 child: Transform.rotate(
-                  angle: hour * (pi * 2) / 12,
-                  child: Divider(
-                    color: Colors.black54,
-                    thickness: 5,
-                    indent: w * 0.25,
-                    endIndent: w * 0.45,
+                  angle: pi / 2,
+                  child: Transform.rotate(
+                    angle: hour * (pi * 2) / 12,
+                    child: Divider(
+                      color: Colors.black54,
+                      thickness: 5,
+                      indent: width * 0.25,
+                      endIndent: width * 0.45,
+                    ),
                   ),
                 ),
               ),
+
               Visibility(
                 visible: isDigital,
                 child: Row(
@@ -206,12 +256,12 @@ class _ClockPageState extends State<ClockPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      height: h * 0.086,
-                      width: w * 0.2,
-                      margin: EdgeInsets.all(h * 0.01),
+                      height: height * 0.086,
+                      width: width * 0.2,
+                      margin: EdgeInsets.all(height * 0.01),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(w * 0.035),
+                        borderRadius: BorderRadius.circular(width * 0.035),
                       ),
                       child: Column(
                         children: [
@@ -232,12 +282,12 @@ class _ClockPageState extends State<ClockPage> {
                       ),
                     ),
                     Container(
-                      height: h * 0.086,
-                      width: w * 0.2,
-                      margin: EdgeInsets.all(h * 0.01),
+                      height: height * 0.086,
+                      width: width * 0.2,
+                      margin: EdgeInsets.all(height * 0.01),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(w * 0.035),
+                        borderRadius: BorderRadius.circular(width * 0.035),
                       ),
                       child: Column(
                         children: [
@@ -258,12 +308,12 @@ class _ClockPageState extends State<ClockPage> {
                       ),
                     ),
                     Container(
-                      height: h * 0.086,
-                      width: w * 0.2,
-                      margin: EdgeInsets.all(h * 0.01),
+                      height: height * 0.086,
+                      width: width * 0.2,
+                      margin: EdgeInsets.all(height * 0.01),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(w * 0.035),
+                        borderRadius: BorderRadius.circular(width * 0.035),
                       ),
                       child: Column(
                         children: [
@@ -287,10 +337,10 @@ class _ClockPageState extends State<ClockPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          height: h * 0.03,
-                          width: w * 0.07,
-                          margin: EdgeInsets.only(top: h * 0.055),
-                          padding: EdgeInsets.all(h * 0.001),
+                          height: height * 0.03,
+                          width: width * 0.07,
+                          margin: EdgeInsets.only(top: height * 0.055),
+                          padding: EdgeInsets.all(height * 0.001),
                           color: Colors.orange.withOpacity(0.5),
                           alignment: Alignment.center,
                           child: Text((hour < 12) ? 'AM' : 'PM'),
@@ -300,11 +350,127 @@ class _ClockPageState extends State<ClockPage> {
                   ],
                 ),
               ),
+
+              // Strap Watch
+
+              // second
+              Visibility(
+                visible: isStrap,
+                child: Transform.scale(
+                  scale: 8,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                    value: second / 60,
+                    color: Colors.redAccent,
+                  ),
+                ),
+              ),
+
+              // Minute
+              Visibility(
+                visible: isStrap,
+                child: Transform.scale(
+                  scale: 7,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                    value: minute / 60,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+
+              // Hour
+              Visibility(
+                visible: isStrap,
+                child: Transform.scale(
+                  scale: 5,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                    value: (hour % 12) / 12,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${h.toString().padLeft(2, '0')} : ${m.toString().padLeft(2, '0')} : ${s.toString().padLeft(2, '0')}",
+                    style: TextStyle(
+                      fontSize: textScaler.scale(35),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          if (!isTimerClock) {
+                            timerClock();
+                          }
+                          setState(() {});
+                        },
+                        child: const Text("Start"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          isTimerClock = false;
+                          timerHistory.add({
+                            'hour': h,
+                            'minute': m,
+                            'second': s,
+                          });
+                          setState(() {});
+                        },
+                        child: const Text("Stop"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          isTimerClock = false;
+                          s = m = h = 0;
+                        },
+                        child: const Text("Restart"),
+                      ),
+                    ],
+                  ),
+                  ...timerHistory
+                      .map((e) => Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "${e['hour']}",
+                                    style: TextStyle(
+                                      fontSize: textScaler.scale(20),
+                                    ),
+                                  ),
+                                  Text(
+                                    "${e['minute']}",
+                                    style: TextStyle(
+                                      fontSize: textScaler.scale(20),
+                                    ),
+                                  ),
+                                  Text(
+                                    "${e['second']}",
+                                    style: TextStyle(
+                                      fontSize: textScaler.scale(20),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ))
+                      .toList()
+                ],
+              )
             ],
           ),
         ),
       ),
-      backgroundColor: Colors.primaries[second % 18].shade300,
+      // backgroundColor: Colors.primaries[second % 18].shade300,
     );
   }
 }
